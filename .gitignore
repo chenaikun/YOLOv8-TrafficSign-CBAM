@@ -1,0 +1,4 @@
+runs/  #训练结果太大，不传
+datasets/ #数据集太大，不传（或者用Git LFS）
+__pycache__/
+*.pt
