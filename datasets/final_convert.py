@@ -7,7 +7,6 @@ BASE_DIR = "/home/monkey/yolo/YOLOv8-TrafficSign-CBAM/datasets/GTSRB"
 TRAIN_IMG_DIR = os.path.join(BASE_DIR, "Final_Training/Images")
 OUTPUT_ROOT = os.path.join(BASE_DIR, "GTSRB_YOLO")
 
-# 如果输出目录已存在，直接报错退出，防止混淆
 if os.path.exists(OUTPUT_ROOT):
     print(f"❌ 错误：{OUTPUT_ROOT} 已存在！请先手动删除它再运行。")
     print(f"   运行: rm -rf {OUTPUT_ROOT}")
@@ -31,13 +30,11 @@ for class_id in range(43):
 train_df = pd.concat(dfs, ignore_index=True)
 print(f"\n✅ 总标注数: {len(train_df)}")
 
-# 划分
 train_split, val_split = train_test_split(
     train_df, test_size=0.2, random_state=42, stratify=train_df['ClassId']
 )
 print(f"训练: {len(train_split)}, 验证: {len(val_split)}")
 
-# 按图片分组转换
 for split_name, df in [("train", train_split), ("val", val_split)]:
     img_dir = os.path.join(OUTPUT_ROOT, "images", split_name)
     lbl_dir = os.path.join(OUTPUT_ROOT, "labels", split_name)
@@ -46,13 +43,15 @@ for split_name, df in [("train", train_split), ("val", val_split)]:
 
     grouped = df.groupby('Filename')
     for img_path, group in grouped:
-        # 转 jpg
-        fname = os.path.splitext(os.path.basename(img_path))[0] + ".jpg"
+        # ← 关键修复：加类别前缀，防止文件名冲突
+        class_folder = os.path.basename(os.path.dirname(img_path))
+        base_name = os.path.splitext(os.path.basename(img_path))[0]
+        fname = f"{class_folder}_{base_name}.jpg"
+
         dst = os.path.join(img_dir, fname)
         img = Image.open(img_path).convert("RGB")
         img.save(dst, quality=95)
 
-        # 写标签
         lbl_path = os.path.join(lbl_dir, os.path.splitext(fname)[0] + ".txt")
         with open(lbl_path, "w") as f:
             for _, row in group.iterrows():
