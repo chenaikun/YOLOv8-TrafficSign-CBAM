@@ -1,4 +1,20 @@
-runs/  #训练结果太大，不传
-datasets/ #数据集太大，不传（或者用Git LFS）
+# ============ 忽略数据集大文件 ============
+# 原始 GTSRB 数据
+datasets/GTSRB/Final_Training/
+datasets/GTSRB/Final_Test/
+
+# 转换后的图片和标签（太大了，不入库）
+datasets/GTSRB/GTSRB_YOLO/images/
+datasets/GTSRB/GTSRB_YOLO/labels/
+
+# 训练输出（runs 目录）
+runs/
+
+# Python 缓存
 __pycache__/
-*.pt
+*.pyc
+
+# Conda/虚拟环境
+env/
+venv/
+.conda/
